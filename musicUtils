@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Setup 
+MusicFolder="$HOME/Music/"
+DownloadsFolder="$HOME/Downloads/"
+prefixToRemove="WWW.DOWNVIDS.NET-"
+
+
+# Remove prefixToRemove from all files in Downloads folder
+/bin/bash $HOME/Documents/utils/s_repref $prefixToRemove $DownloadsFolder
+
+# Scan Downloads folder for any .mp4 files in order to convert them
+# Do not convert if there already exists an .mp3 file
+for i in  "$DownloadsFolder"*.mp4; do
+
+	mp3fileToCheck="${i:0:-4}.mp3"
+
+	echo "Mp4 File Found:  $i"
+	echo "Mp3 File to Check:  $mp3fileToCheck"
+ 
+	if [ -f "$mp3fileToCheck" ]
+	then
+		echo "!== Ignoring/ Already Converted $mp3fileToCheck"
+	else
+		echo "~~~ Starting conversion on $i --> $mp3fileToCheck"
+		
+		# Check if file in Use
+		if [ $(lsof | grep "$i" | wc -l) -gt 0 ]
+        	then    
+                	echo "!! Error. File in use. Cannot Convert $i"          
+        	else
+			soundconverter -b -m mp3 -q -s ".mp3" "$i";
+        	fi
+	fi
+
+done
