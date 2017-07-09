@@ -1,0 +1,18 @@
+#!/bin/bash
+
+remove=$1
+origpath=`pwd`
+
+cd $2
+
+for i in  "$remove"*;do 
+	
+	if [ $(lsof | grep "$i" | wc -l) -gt 0 ]
+	then	
+		echo "!! Error. File in use. Cannot rename $i"   	
+	else
+		mv "$i" "${i#"$remove"}";
+	fi
+done
+
+cd $origpath
